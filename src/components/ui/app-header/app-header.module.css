@@ -30,6 +30,12 @@
   flex-basis: 35%;
 }
 
+.link_wrapper{
+  display: flex;
+  text-decoration: none;
+  color: white;
+}
+
 .logo {
   display: flex;
   align-items: center;
