@@ -2,7 +2,8 @@ import {
   getFeedsApi,
   getIngredientsApi,
   getOrderByNumberApi,
-  getOrdersApi
+  getOrdersApi,
+  TRegisterData
 } from '@api';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TIngredient, TOrder } from '@utils-types';
@@ -17,12 +18,10 @@ export const getFeedsThunk = createAsyncThunk(
   async () => getFeedsApi()
 );
 
-// Должна быть авторизация для получения этих данных
-
-// export const getOrderThunk = createAsyncThunk(
-//   'burgers/getOrderThunk',
-//   async () => getOrdersApi()
-// );
+export const getOrdersThunk = createAsyncThunk(
+  'auth/getOrdersThunk',
+  async () => getOrdersApi()
+);
 
 export const getOrderByNumberThunk = createAsyncThunk(
   'burgers/getOrderByNumberThunk',
@@ -37,6 +36,12 @@ type TInitialState = {
   modalIsOpened: boolean;
   orderData: TOrder | undefined;
   ingredientData: TIngredient | undefined;
+  constructorItems: {
+    bun: TIngredient;
+    ingredients: TIngredient[];
+  };
+  myOrders: Array<TOrder>;
+  myOrderData: TOrder | undefined;
 };
 
 const initialState: TInitialState = {
@@ -66,6 +71,32 @@ const initialState: TInitialState = {
     image: '',
     image_large: '',
     image_mobile: ''
+  },
+  constructorItems: {
+    bun: {
+      _id: '',
+      name: '',
+      type: '',
+      proteins: 0,
+      fat: 0,
+      carbohydrates: 0,
+      calories: 0,
+      price: 0,
+      image: '',
+      image_large: '',
+      image_mobile: ''
+    },
+    ingredients: []
+  },
+  myOrders: [],
+  myOrderData: {
+    createdAt: '',
+    ingredients: [],
+    _id: '',
+    status: '',
+    name: '',
+    updatedAt: 'string',
+    number: 0
   }
 };
 
@@ -82,11 +113,12 @@ const burgerSlice = createSlice({
       state.ingredientData = state.ingridients.find(
         (el) => el._id === action.payload
       );
-    }
+    },
+    addIngridientsToOrder: (state, action) => {}
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getIngredientsThunk.pending, (state, action) => {
+      .addCase(getIngredientsThunk.pending, (state) => {
         state.loading = true;
       })
       .addCase(getIngredientsThunk.fulfilled, (state, action) => {
@@ -98,7 +130,7 @@ const burgerSlice = createSlice({
       });
 
     builder
-      .addCase(getFeedsThunk.pending, (state, action) => {
+      .addCase(getFeedsThunk.pending, (state) => {
         state.loading = true;
       })
       .addCase(getFeedsThunk.fulfilled, (state, action) => {
@@ -106,7 +138,7 @@ const burgerSlice = createSlice({
         state.feed = action.payload;
         state.orders = action.payload.orders;
       })
-      .addCase(getFeedsThunk.rejected, (state, action) => {
+      .addCase(getFeedsThunk.rejected, (state) => {
         state.loading = false;
       });
     // builder
@@ -125,18 +157,18 @@ const burgerSlice = createSlice({
     //   });
 
     // Должна быть авторизация для получения этих данных
-    // builder
-    //   .addCase(getOrderThunk.pending, (state, action) => {
-    //     state.loading = true;
-    //   })
-    //   .addCase(getOrderThunk.fulfilled, (state, action) => {
-    //     state.loading = false;
-    //     console.log(action.payload);
-    //     // state.ingridients = action.payload;
-    //   })
-    //   .addCase(getOrderThunk.rejected, (state, action) => {
-    //     state.loading = false;
-    //   });
+    builder
+      .addCase(getOrdersThunk.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getOrdersThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log(action.payload);
+        state.myOrders = action.payload;
+      })
+      .addCase(getOrdersThunk.rejected, (state, action) => {
+        state.loading = false;
+      });
   }
 });
 

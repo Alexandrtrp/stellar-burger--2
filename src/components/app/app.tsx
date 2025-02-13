@@ -14,25 +14,35 @@ import styles from './app.module.css';
 
 import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   getFeedsThunk,
-  getIngredientsThunk
+  getIngredientsThunk,
+  getOrdersThunk
   // getOrderThunk
 } from '../../services/burgerSlice';
-import { useDispatch } from '../../services/store';
+import { useDispatch, useSelector } from '../../services/store';
+import { getUserThunk } from '../../services/authSlice';
+import { getCookie } from '../../utils/cookie';
+import { ProtectedRoute } from '../protected-route';
 
 // export const closeModal = () => {};
 
 const App = () => {
   const navigate = useNavigate();
-  const [isAuth, setIsAuth] = useState(false);
   const dispatch = useDispatch();
+  const myOrders = useSelector((state) => state.burgers.myOrders);
+
   useEffect(() => {
+    dispatch(getUserThunk());
     dispatch(getIngredientsThunk());
     dispatch(getFeedsThunk());
-    // Нужна авторизация
-    // dispatch(getOrderThunk());
+  }, []);
+
+  useEffect(() => {
+    if (myOrders) {
+      dispatch(getOrdersThunk());
+    }
   }, []);
 
   return (
@@ -45,11 +55,30 @@ const App = () => {
         <Route path='*' element={<NotFound404 />} />
 
         {/* Переделать на защищенные роуты */}
-        <Route path='/login' element={<Login />} />
+
+        <Route
+          path='/login'
+          element={
+            <ProtectedRoute>
+              <Login />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/profile'
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* <Route path='/profile' element={<Profile />} />
+        <Route path='/login' element={<Login />} /> */}
+
         <Route path='/register' element={<Register />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password' element={<ResetPassword />} />
-        <Route path='/profile' element={<Profile />} />
         <Route path='/profile/orders' element={<ProfileOrders />} />
 
         {/* Модалки  */}
@@ -64,7 +93,7 @@ const App = () => {
         <Route
           path='/ingredients/:id'
           element={
-            <Modal title={'Ингридиент'} onClose={(): void => navigate(-1)}>
+            <Modal title={'Ингредиент'} onClose={(): void => navigate(-1)}>
               <IngredientDetails />
             </Modal>
           }

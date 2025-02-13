@@ -1,12 +1,13 @@
 import { ProfileUI } from '@ui-pages';
 import { FC, SyntheticEvent, useEffect, useState } from 'react';
+import { useSelector } from '../../services/store';
+import { Preloader } from '@ui';
+import { Navigate } from 'react-router-dom';
 
 export const Profile: FC = () => {
   /** TODO: взять переменную из стора */
-  const user = {
-    name: '',
-    email: ''
-  };
+  const user = useSelector((state) => state.auth.data);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   const [formValue, setFormValue] = useState({
     name: user.name,
@@ -26,6 +27,10 @@ export const Profile: FC = () => {
     formValue.name !== user?.name ||
     formValue.email !== user?.email ||
     !!formValue.password;
+
+  if (!isAuthenticated) {
+    return <Navigate to={'/login'} />;
+  }
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -56,6 +61,4 @@ export const Profile: FC = () => {
       handleInputChange={handleInputChange}
     />
   );
-
-  return null;
 };

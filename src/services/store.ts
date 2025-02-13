@@ -6,6 +6,7 @@ import {
   useSelector as selectorHook
 } from 'react-redux';
 import { burgerReducer } from './burgerSlice';
+import { authReducer } from './authSlice';
 
 // const rootReducer = () => {
 //   burgerReducer;
@@ -13,7 +14,8 @@ import { burgerReducer } from './burgerSlice';
 
 const store = configureStore({
   reducer: {
-    burgers: burgerReducer
+    burgers: burgerReducer,
+    auth: authReducer
   },
   devTools: process.env.NODE_ENV !== 'production'
 });

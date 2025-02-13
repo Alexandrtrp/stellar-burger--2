@@ -2,12 +2,16 @@ import { FC, useMemo } from 'react';
 import { TConstructorIngredient } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from '../../services/store';
 
 export const BurgerConstructor: FC = () => {
   const navigate = useNavigate();
   // Хрен знает где взять
 
   /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
+
+  const ingredients = useSelector((state) => state.burgers.ingridients);
+
   const constructorItems = {
     bun: {
       price: 0
@@ -18,6 +22,7 @@ export const BurgerConstructor: FC = () => {
   const orderRequest = false;
 
   const orderModalData = null;
+  // useSelector((state) => state.burgers.orderData);
 
   const onOrderClick = () => {
     if (!constructorItems.bun || orderRequest) return;
