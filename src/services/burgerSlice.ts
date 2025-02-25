@@ -41,7 +41,7 @@ type TInitialState = {
     ingredients: TIngredient[];
   };
   myOrders: Array<TOrder>;
-  myOrderData: TOrder | undefined;
+  // myOrderData: TOrder | undefined;
 };
 
 const initialState: TInitialState = {
@@ -88,16 +88,16 @@ const initialState: TInitialState = {
     },
     ingredients: []
   },
-  myOrders: [],
-  myOrderData: {
-    createdAt: '',
-    ingredients: [],
-    _id: '',
-    status: '',
-    name: '',
-    updatedAt: 'string',
-    number: 0
-  }
+  myOrders: []
+  // myOrderData: {
+  //   createdAt: '',
+  //   ingredients: [],
+  //   _id: '',
+  //   status: '',
+  //   name: '',
+  //   updatedAt: 'string',
+  //   number: 0
+  // }
 };
 
 const burgerSlice = createSlice({
@@ -105,6 +105,9 @@ const burgerSlice = createSlice({
   initialState,
   reducers: {
     setOrderToModal: (state, action) => {
+      // if (state.orderData === null) {
+      //   return;
+      // }
       state.orderData = state.orders.find(
         (order) => order.number === action.payload
       );
@@ -114,7 +117,32 @@ const burgerSlice = createSlice({
         (el) => el._id === action.payload
       );
     },
-    addIngridientsToOrder: (state, action) => {}
+    addIngridientsToOrder: (state, action) => {
+      if (action.payload.type === 'bun') {
+        state.constructorItems.bun = action.payload;
+        return;
+      }
+      state.constructorItems.ingredients.push(action.payload);
+    },
+    moveUpIngridient: (state, action) => {
+      state.constructorItems.ingredients.splice(action.payload.index, 1);
+      state.constructorItems.ingredients.splice(
+        action.payload.index - 1,
+        0,
+        action.payload.ingredient
+      );
+    },
+    moveDownIngridient: (state, action) => {
+      state.constructorItems.ingredients.splice(action.payload.index, 1);
+      state.constructorItems.ingredients.splice(
+        action.payload.index + 1,
+        0,
+        action.payload.ingredient
+      );
+    },
+    deleteIngridientInOrder: (state, action) => {
+      state.constructorItems.ingredients.splice(action.payload, 1);
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -163,7 +191,6 @@ const burgerSlice = createSlice({
       })
       .addCase(getOrdersThunk.fulfilled, (state, action) => {
         state.loading = false;
-        console.log(action.payload);
         state.myOrders = action.payload;
       })
       .addCase(getOrdersThunk.rejected, (state, action) => {
@@ -173,4 +200,11 @@ const burgerSlice = createSlice({
 });
 
 export const burgerReducer = burgerSlice.reducer;
-export const { setOrderToModal, setIngridientToModal } = burgerSlice.actions;
+export const {
+  setOrderToModal,
+  setIngridientToModal,
+  addIngridientsToOrder,
+  moveUpIngridient,
+  moveDownIngridient,
+  deleteIngridientInOrder
+} = burgerSlice.actions;
